@@ -1,10 +1,10 @@
 ```
-docker build -t telegram-ollama-bot .
+docker build -t ollama-tbot .
 ```
 
 ```
-docker run -d \
-  -v /path/to/logs:/app/logs \
-  -v /path/to/config.json:/app/config.json \
-  telegram-ollama-bot
+docker run -d --name otbot --restart always\
+  -v /path/logs:/app/logs \
+  -v /path/config:/app/config \
+  ollama-tbot
 ```
