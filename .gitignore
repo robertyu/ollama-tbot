@@ -1,0 +1,6 @@
+run.sh
+config/config.json
+__pycache__
+__pycache__/
+logs
+logs/

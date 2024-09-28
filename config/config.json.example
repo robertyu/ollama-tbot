@@ -1,0 +1,13 @@
+{
+    "api_id": "xxxxx",
+    "api_hash": "xxxxx",
+    "bot_token": "xxxxxx",
+    "admin_user_ids": [xxxxx, xxxxx],
+    "ollama_servers": [
+        { "url": "http://10.1.120.52:11434", "header_token": "", "default_model": "llama3.2:latest" },
+        { "url": "http://10.1.120.68:11434", "header_token": "", "default_model": "llama3.1:latest" },
+        { "url": "http://10.1.120.51:11434", "header_token": "", "default_model": "llama3.1:latest" },
+        { "url": "http://127.0.0.1:11434", "header_token": "", "default_model": "llama3.1:latest" }
+    ],
+    "log_path": "logs/bot.log"
+}
