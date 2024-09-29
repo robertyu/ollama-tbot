@@ -242,7 +242,7 @@ async def handle_message(event):
     # async for response in ollama_client.generate_response(model, default_prompt):
     #     logger.debug(f'response: {response}, type: {type(response)}')
     #     await event.respond(response)
-    if event.mentioned and not event.is_group:  # Only respond to mentions in private chats
+    if event.mentioned and event.is_group:  # Only respond to mentions in private chats
         print(f'bot_info.username: {bot_info.username}')
         input_msg = message.replace(f'@{bot_info.username}', '')
         response = await ollama_client.generate_response(input_msg)
