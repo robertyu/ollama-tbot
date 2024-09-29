@@ -242,7 +242,6 @@ async def handle_message(event):
     # async for response in ollama_client.generate_response(model, default_prompt):
     #     logger.debug(f'response: {response}, type: {type(response)}')
     #     await event.respond(response)
-    logger.debug(f'event.mentioned and event.is_group: {event.mentioned and event.is_group}, mentioned: {event.mentioned}, is_group: {event.is_group}')
     if event.mentioned and event.is_group:
         logger.debug(f'GROUP CHAT - bot_info.username: {bot_info.username} event.is_group: {event.is_group}, id: {chat_id}, message: {message}, event.mentioned: {event.mentioned}')
         input_msg = message.replace(f'@{bot_info.username}', '')
@@ -251,12 +250,14 @@ async def handle_message(event):
             logger.error(f'Error generating response: {response["error"]}, details: {response["details"]}')
             await event.respond(response['error'])
         await event.reply(response['response'])
-    else:
+    elif not event.is_group:
         response = await ollama_client.generate_response(message)
         if 'error' in response:
             logger.error(f'Error generating response: {response["error"]}, details: {response["details"]}')
             await event.respond(response['error'])
         await event.reply(response['response'])
+    else:
+        logger.debug(f'NO RESPONSE event.is_group: {event.is_group}, id: {chat_id}, message: {message}, event.mentioned: {event.mentioned}')
 
 
 def main():
