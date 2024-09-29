@@ -236,14 +236,14 @@ async def handle_message(event):
         logger.debug(f'Ignoring command {message} from {chat_id}')
         return  # Ignore other commands
 
-    h_logger.debug(f'NewMessage event.is_group: {event.is_group}, id: {chat_id}, sender: {sender}, event.mentioned: {event.mentioned}')
+    h_logger.debug(f'NewMessage event.is_group: {event.is_group}, id: {chat_id}, message: {message}, event.mentioned: {event.mentioned}')
     if not bot_info:
         bot_info = await bot.get_me()
     # async for response in ollama_client.generate_response(model, default_prompt):
     #     logger.debug(f'response: {response}, type: {type(response)}')
     #     await event.respond(response)
     if event.mentioned and event.is_group:  # Only respond to mentions in private chats
-        logger.debug(f'GROUP CHAT - bot_info.username: {bot_info.username}')
+        logger.debug(f'GROUP CHAT - bot_info.username: {bot_info.username} event.is_group: {event.is_group}, id: {chat_id}, message: {message}, event.mentioned: {event.mentioned}')
         input_msg = message.replace(f'@{bot_info.username}', '')
         response = await ollama_client.generate_response(input_msg)
         if 'error' in response:
