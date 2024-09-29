@@ -52,15 +52,15 @@ def require_permission(func):
         logger.debug(f'sender: {sender}')
         user_id = sender.id
         if user_id in ADMIN_USER_IDS:
+            logger.debug('User has permission')
             return await func(event, *args, **kwargs) 
         else:
             await event.respond("yo yo, no permission!")
-    
     return wrapper
 
 
-@require_permission
 @bot.on(events.NewMessage(pattern='/start'))
+@require_permission
 async def start(event):
     global logger
     chat_id = event.chat_id
@@ -72,8 +72,8 @@ async def start(event):
     logger.debug(f'/start command received from {chat_id}')
 
 
-@require_permission
 @bot.on(events.NewMessage(pattern='/list_ollama_servers'))
+@require_permission
 async def list_ollama_servers(event):
     global logger
     servers = config.get('ollama_servers', [])
@@ -85,8 +85,8 @@ async def list_ollama_servers(event):
     logger.debug(f'List of Ollama servers requested by {event.chat_id}')
 
 
-@require_permission
 @bot.on(events.NewMessage(pattern='/add_ollama_server'))
+@require_permission
 async def set_ollama_server(event):
     global logger
     args = event.message.text.split()
@@ -110,8 +110,8 @@ async def set_ollama_server(event):
         return
 
 
-@require_permission
 @bot.on(events.NewMessage(pattern='/delete_ollama_server'))
+@require_permission
 async def delete_ollama_server(event):
     global logger
     args = event.message.text.split()
@@ -133,8 +133,8 @@ async def delete_ollama_server(event):
         logger.error(f'Error deleting Ollama server: {e}')
 
 
-@require_permission
 @bot.on(events.NewMessage(pattern='/set_default_server'))
+@require_permission
 async def set_default_server(event):
     global logger
     args = event.message.raw_text.split()
