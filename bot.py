@@ -65,9 +65,9 @@ async def start(event):
     global logger
     chat_id = event.chat_id
     help_str = f'Your chat ID: {chat_id}\nUse /list_ollama_servers to display available servers.\nUse /add_ollama_server to add the Ollama server.\nUse /delete_ollama_server to remote the Ollama server.'
-    help_str += '\nUse /set_default_server <server_url> to set a default Ollama server for this chat.'
+    help_str += '\nUse /set_server_order to set server order.'
     help_str += '\nUse /get_models <server_url> to get models from the Ollama server.'
-    help_str += '\nUse set_model <model_name> to set a model for this chat.'
+    help_str += '\nUse /set_model <model_name> to set a model for this chat.'
     await event.respond(help_str)
     logger.debug(f'/start command received from {chat_id}')
 
@@ -133,32 +133,24 @@ async def delete_ollama_server(event):
         logger.error(f'Error deleting Ollama server: {e}')
 
 
-@bot.on(events.NewMessage(pattern='/set_default_server'))
+@bot.on(events.NewMessage(pattern='/set_server_order'))
 @require_permission
-async def set_default_server(event):
+async def set_server_order(event):
     global logger
     args = event.message.raw_text.split()
     if len(args) != 2:
-        await event.respond('Usage: /set_default_server <server_url>')
+        await event.respond('Usage: /set_server_order <server_url>,<server_url>...')
         return
     try:
-        server_url = args[1]
-        logger.debug(f'set_default_server server_url: server_url: {server_url}')
-        if server_url not in [server['url'] for server in config['ollama_servers']]:
+        server_sequence = args[1].split(',')
+        logger.debug(f'set_server_order server sequence: {server_sequence}')
+        if any([server_url for server_url in server_sequence if server_url not in [server['url'] for server in config['ollama_servers']]]):
             await event.respond('Server URL not found.')
             return
-        for server in config['ollama_servers']:
-            if server['url'] == server_url:
-                models = await ollama_client.get_models(server_url)
-                if 'error' in models:
-                    logger.error(f'Error getting models: {models["error"]} from {server_url}')
-                    await event.respond(f'The server {server_url} could not access right now')
-                    return
-                config['default_server'] = server_url
-                save_config(config)
-                logger.info(f'Default server set to: {server_url}')
-                await event.respond(f'Default server set to: {server_url}')
-                break
+        config['server_order'] = server_sequence
+        save_config(config)
+        logger.info(f'Server order set to: {server_sequence}')
+        await event.respond(f'server sequence set to: {server_sequence}')
     except Exception as e:
         logger.error(f'Error setting default server: {e}')
         await event.respond('An error occurred while setting the default server.')

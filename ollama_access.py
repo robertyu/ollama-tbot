@@ -43,25 +43,13 @@ class OllamaClient:
         # raw: if true no formatting will be applied to the prompt. You may choose to use the raw parameter if you are specifying a full templated prompt in your request to the API
         # keep_alive: controls how long the model will stay loaded into memory following the request (default: 5m)
         self.logger.debug(f'payload: {payload}')
-        if 'default_server' in self.config and self.config['default_server'] is not None:
-            default_server_url = self.config['default_server']
-            for server in self.config.get('ollama_servers'):
-                if server['url'] == default_server_url:
-                    try:
-                        headers = {'Authorization': f'Bearer {server['header_token']}'} if server['header_token'] else {}
-                        payload['model'] = server['default_model']
-                        url = f"{server['url']}/api/generate"
-                        async with aiohttp.ClientSession(headers=headers, trust_env=True) as session:
-                            async with session.post(url, json=payload) as resp:
-                                self.logger.info(f'Response: {await resp.text()}')
-                                if resp.status != 200:
-                                    self.logger.error(f'Error generating response from {server}: {await resp.text()}')
-                                self.logger.debug(f'access server: {server}')
-                                return await resp.json()
-                    except Exception as e:
-                        self.logger.error(f'Error generating response from {server}: {e}, {traceback.format_exc()}')
-
-        for server in self.config.get('ollama_servers'):
+        if 'server_sequence' in self.config:
+            sorted_servers = sorted(self.config["ollama_servers"], key=lambda server: self.config["server_sequence"].index(server["url"]))
+            self.logger.debug(f'sorted_servers: {sorted_servers}')
+        else:
+            sorted_servers = self.config['ollama_servers']
+        
+        for server in sorted_servers:
             try:
                 headers = {'Authorization': f'Bearer {server['header_token']}'} if server['header_token'] else {}
                 payload['model'] = server['default_model']
